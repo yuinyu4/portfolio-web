@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eunchan Kim Portfolio</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0f0f0f;
+  color: #eaeaea;
+  font-family: 'Pretendard', sans-serif;
+  line-height: 1.6;
+}
+
+.container {
+  width: 90%;
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* HERO */
+.hero {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+.hero p {
+  margin-top: 10px;
+  color: #aaa;
+}
+
+/* SECTION */
+section {
+  margin: 100px 0;
+}
+
+h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+/* CARD */
+.card {
+  background: #1a1a1a;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* INPUT */
+input, textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  background: #111;
+  border: none;
+  color: white;
+}
+
+button {
+  padding: 10px;
+  background: white;
+  color: black;
+  border: none;
+  cursor: pointer;
+}
+
+/* GALLERY */
+.gallery img {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
+/* ANIMATION */
+.fade {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: 1s;
+}
+
+.fade.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <h1>Eunchan Kim</h1>
+    <p>Backend Developer & Visual Creator</p>
+    <p>Building practical backend systems and capturing moments.</p>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section>
+  <h2>Projects</h2>
+
+  <div id="projectList"></div>
+
+  <h3>Add Project</h3>
+  <input id="title" placeholder="Project Title">
+  <textarea id="desc" placeholder="Description"></textarea>
+  <input id="tech" placeholder="Tech Stack">
+  <input id="link" placeholder="GitHub Link">
+  <button onclick="addProject()">Add</button>
+</section>
+
+<!-- PHOTOS -->
+<section>
+  <h2>Photography</h2>
+  <p>Sony Alpha 7 IV · Tamron 70-180 · Sony 24-105 · Zeiss 55mm</p>
+
+  <div id="gallery" class="gallery"></div>
+
+  <h3>Upload Photo</h3>
+  <input type="file" id="photoInput">
+  <input type="date" id="photoDate">
+  <button onclick="addPhoto()">Upload</button>
+</section>
+
+</div>
+
+<script>
+/* PROJECT SYSTEM */
+function addProject() {
+  let projects = JSON.parse(localStorage.getItem("projects")) || [];
+
+  let project = {
+    title: title.value,
+    desc: desc.value,
+    tech: tech.value,
+    link: link.value
+  };
+
+  projects.push(project);
+  localStorage.setItem("projects", JSON.stringify(projects));
+  renderProjects();
+}
+
+function renderProjects() {
+  let projects = JSON.parse(localStorage.getItem("projects")) || [];
+  projectList.innerHTML = "";
+
+  projects.forEach(p => {
+    projectList.innerHTML += `
+      <div class="card fade">
+        <h3>${p.title}</h3>
+        <p>${p.desc}</p>
+        <small>${p.tech}</small><br>
+        <a href="${p.link}" target="_blank">GitHub</a>
+      </div>
+    `;
+  });
+}
+
+/* PHOTO SYSTEM */
+function addPhoto() {
+  let photos = JSON.parse(localStorage.getItem("photos")) || [];
+
+  let file = photoInput.files[0];
+  let date = photoDate.value;
+
+  let reader = new FileReader();
+  reader.onload = function() {
+    photos.push({ img: reader.result, date: date });
+
+    // 날짜순 정렬
+    photos.sort((a,b)=> new Date(b.date) - new Date(a.date));
+
+    localStorage.setItem("photos", JSON.stringify(photos));
+    renderPhotos();
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderPhotos() {
+  let photos = JSON.parse(localStorage.getItem("photos")) || [];
+  gallery.innerHTML = "";
+
+  photos.forEach(p => {
+    gallery.innerHTML += `
+      <div class="fade">
+        <small>${p.date}</small>
+        <img src="${p.img}">
+      </div>
+    `;
+  });
+}
+
+/* SCROLL ANIMATION */
+function reveal() {
+  document.querySelectorAll(".fade").forEach(el => {
+    if (el.getBoundingClientRect().top < window.innerHeight - 50) {
+      el.classList.add("show");
+    }
+  });
+}
+
+window.addEventListener("scroll", reveal);
+
+/* INIT */
+renderProjects();
+renderPhotos();
+</script>
+
+</body>
+</html>
