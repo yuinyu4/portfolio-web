@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-left">eunchan</div>
+  <div class="nav-right">
+    <a href="index.html">Home</a>
+    <a href="projects.html">Projects</a>
+    <a href="photos.html" class="active">Photos</a>
+    <a href="upload.html">Upload</a>
+  </div>
+</nav>
+
+<section class="section">
+  <h2>Photography</h2>
+  <div id="gallery" class="gallery"></div>
+</section>
+
+<div id="modal" class="modal">
+  <span onclick="closeModal()">×</span>
+  <img id="modalImg">
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

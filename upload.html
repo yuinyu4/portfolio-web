@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-left">eunchan</div>
+  <div class="nav-right">
+    <a href="index.html">Home</a>
+    <a href="projects.html">Projects</a>
+    <a href="photos.html">Photos</a>
+    <a href="upload.html" class="active">Upload</a>
+  </div>
+</nav>
+
+<section class="section">
+  <h2>Upload</h2>
+
+  <div class="card">
+    <h3>Add Project</h3>
+    <input id="title" placeholder="Title">
+    <textarea id="desc" placeholder="Description"></textarea>
+    <input id="tech" placeholder="Tech Stack">
+    <input id="link" placeholder="GitHub Link">
+    <button onclick="addProject()">Add</button>
+  </div>
+
+  <div class="card">
+    <h3>Upload Photo</h3>
+    <input type="file" id="photoInput">
+    <input type="date" id="photoDate">
+    <button onclick="addPhoto()">Upload</button>
+  </div>
+
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
