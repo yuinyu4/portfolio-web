@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eunchan Kim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500&family=Fira+Code:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --bg1: #0f0f0f;
+  --bg2: #141414;
+  --text: #f0ede8;
+  --sub: #5a5856;
+  --accent: #b8ff57;
+  --accent-dim: rgba(184,255,87,0.12);
+  --border: rgba(255,255,255,0.06);
+  --border-hover: rgba(184,255,87,0.25);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* CURSOR */
+.cursor {
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: transform 0.05s;
+}
+.cursor-ring {
+  width: 32px; height: 32px;
+  border: 1px solid rgba(184,255,87,0.4);
+  border-radius: 50%;
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: transform 0.12s ease, width 0.2s, height 0.2s, border-color 0.2s;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.6rem 3rem;
+  transition: background 0.4s, backdrop-filter 0.4s;
+}
+nav.scrolled {
+  background: rgba(8,8,8,0.88);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.nav-links a {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--sub);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+
+/* HERO */
+#hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 3rem 5rem;
+  position: relative;
+}
+.hero-noise {
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.hero-line {
+  position: absolute; top: 0; left: 3rem;
+  width: 1px; height: 100%;
+  background: linear-gradient(to bottom, transparent, var(--border) 30%, var(--border) 70%, transparent);
+}
+.hero-status {
+  display: flex; align-items: center; gap: 0.6rem;
+  margin-bottom: 2.5rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.7rem;
+  color: var(--sub);
+}
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(3.5rem, 10vw, 9rem);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  color: var(--text);
+  margin-bottom: 2.5rem;
+}
+h1 .accent-word { color: var(--accent); }
+.hero-bottom {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 2rem;
+}
+.hero-desc {
+  max-width: 400px;
+  font-size: 0.9rem;
+  color: var(--sub);
+  line-height: 1.8;
+  font-weight: 300;
+}
+.hero-cta-group { display: flex; gap: 1rem; flex-shrink: 0; }
+.cta-btn {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  color: var(--sub);
+  transition: all 0.2s;
+  position: relative; overflow: hidden;
+}
+.cta-btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--accent-dim);
+  transform: translateX(-100%);
+  transition: transform 0.3s;
+}
+.cta-btn:hover { color: var(--accent); border-color: var(--border-hover); }
+.cta-btn:hover::before { transform: translateX(0); }
+.cta-btn svg { width: 14px; height: 14px; fill: currentColor; flex-shrink: 0; position: relative; }
+.cta-btn span { position: relative; }
+
+/* SECTION */
+section { padding: 7rem 3rem; border-top: 1px solid var(--border); }
+.sec-eyebrow {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.65rem;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  margin-bottom: 3rem;
+  display: flex; align-items: center; gap: 0.8rem;
+}
+.sec-eyebrow::before { content: '//'; color: var(--sub); }
+h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 4rem);
+  letter-spacing: -0.03em;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 4rem;
+}
+
+/* ABOUT */
+.about-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+.about-text p {
+  font-size: 0.92rem;
+  color: var(--sub);
+  line-height: 1.9;
+  margin-bottom: 1.2rem;
+}
+.about-text p strong { color: var(--text); font-weight: 400; }
+.about-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; }
+.about-tag {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.65rem;
+  color: var(--sub);
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.8rem;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+}
+.about-tag:hover { color: var(--accent); border-color: var(--border-hover); background: var(--accent-dim); }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+.stat-box {
+  background: var(--bg1);
+  padding: 2rem;
+}
+.stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+.stat-label { font-size: 0.75rem; color: var(--sub); }
+
+/* SKILLS */
+.skills-list { display: flex; flex-direction: column; gap: 0; max-width: 700px; }
+.skill-row {
+  display: grid; grid-template-columns: 120px 1fr 60px;
+  align-items: center; gap: 2rem;
+  padding: 1.4rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.skill-row:first-child { border-top: 1px solid var(--border); }
+.skill-name-s {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.skill-track {
+  height: 2px;
+  background: var(--border);
+  position: relative; overflow: hidden;
+}
+.skill-fill-s {
+  position: absolute; top: 0; left: 0; height: 100%;
+  background: var(--accent);
+  width: 0%; transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
+}
+.skill-pct {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.7rem;
+  color: var(--sub);
+  text-align: right;
+}
+
+/* PROJECTS */
+.projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+.proj-card {
+  background: var(--bg1);
+  padding: 2.5rem;
+  transition: background 0.25s;
+  cursor: default;
+  position: relative; overflow: hidden;
+}
+.proj-card::after {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: var(--accent);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+}
+.proj-card:hover { background: var(--bg2); }
+.proj-card:hover::after { transform: scaleX(1); }
+.proj-idx {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.62rem;
+  color: var(--sub);
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.1em;
+}
+.proj-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 0.8rem;
+}
+.proj-desc {
+  font-size: 0.82rem;
+  color: var(--sub);
+  line-height: 1.75;
+  margin-bottom: 2rem;
+}
+.proj-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.6rem;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 0.25rem 0.65rem;
+  letter-spacing: 0.04em;
+}
+
+/* CAMERA */
+.camera-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+.cam-model-big {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(3rem, 7vw, 6rem);
+  letter-spacing: -0.04em;
+  color: var(--text);
+  line-height: 0.9;
+  margin-bottom: 0.5rem;
+}
+.cam-brand {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.65rem;
+  color: var(--accent);
+  letter-spacing: 0.2em;
+  margin-bottom: 3rem;
+  text-transform: uppercase;
+}
+.spec-table { width: 100%; border-collapse: collapse; }
+.spec-table tr { border-bottom: 1px solid var(--border); }
+.spec-table td { padding: 1rem 0; font-size: 0.82rem; }
+.spec-table td:first-child { color: var(--sub); width: 45%; }
+.spec-table td:last-child { color: var(--text); }
+.lenses-wrap { display: flex; flex-direction: column; gap: 1px; background: var(--border); margin-top: 2rem; }
+.lens-row {
+  background: var(--bg1);
+  padding: 1.4rem 1.6rem;
+  display: flex; align-items: center; gap: 1rem;
+  transition: background 0.2s;
+}
+.lens-row:hover { background: var(--bg2); }
+.lens-icon {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0;
+}
+.lens-name { font-size: 0.85rem; color: var(--text); font-weight: 400; }
+.lens-note { font-size: 0.72rem; color: var(--sub); margin-top: 0.15rem; }
+
+/* GALLERY */
+.gallery-wrap {
+  columns: 3; column-gap: 1px;
+  max-width: 100%;
+}
+.gal-item {
+  break-inside: avoid;
+  margin-bottom: 1px;
+  position: relative; overflow: hidden;
+  cursor: pointer;
+  background: var(--bg1);
+}
+.gal-item img {
+  width: 100%; display: block;
+  transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+.gal-item:hover img { transform: scale(1.04); }
+.gal-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(8,8,8,0.85) 0%, transparent 50%);
+  padding: 1.2rem;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  opacity: 0; transition: opacity 0.3s;
+}
+.gal-item:hover .gal-overlay { opacity: 1; }
+.gal-loc { font-family: 'Fira Code', monospace; font-size: 0.62rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; }
+.gal-date { font-size: 0.7rem; color: var(--sub); margin-top: 0.2rem; }
+.gallery-empty-msg {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.7rem; color: var(--sub);
+  padding: 4rem 0; letter-spacing: 0.1em;
+}
+
+/* LIGHTBOX */
+.lb {
+  position: fixed; inset: 0; z-index: 9990;
+  background: rgba(8,8,8,0.97);
+  display: none; align-items: center; justify-content: center;
+}
+.lb.open { display: flex; }
+.lb-inner { max-width: 90vw; position: relative; }
+.lb-inner img { max-height: 80vh; max-width: 100%; display: block; object-fit: contain; }
+.lb-meta {
+  display: flex; justify-content: space-between;
+  padding: 0.8rem 0; font-family: 'Fira Code', monospace; font-size: 0.65rem;
+}
+.lb-close {
+  position: absolute; top: -2.5rem; right: 0;
+  background: none; border: none; color: var(--sub);
+  font-family: 'Fira Code', monospace; font-size: 0.7rem;
+  cursor: none; letter-spacing: 0.1em; transition: color 0.2s;
+}
+.lb-close:hover { color: var(--accent); }
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2.5rem 3rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.foot-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.foot-copy {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.6rem;
+  color: var(--sub);
+}
+
+/* ADMIN FLOAT */
+.admin-float {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 50;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--sub);
+  padding: 0.6rem 1rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.6rem;
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  transition: all 0.2s;
+}
+.admin-float:hover { color: var(--accent); border-color: var(--border-hover); }
+
+/* SCROLL FADE IN */
+.fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 768px) {
+  nav { padding: 1.2rem 1.5rem; }
+  .nav-links { gap: 1.2rem; }
+  section { padding: 5rem 1.5rem; }
+  #hero { padding: 0 1.5rem 4rem; }
+  h1 { font-size: clamp(2.8rem, 14vw, 6rem); }
+  .about-cols { grid-template-columns: 1fr; gap: 3rem; }
+  .projects-grid { grid-template-columns: 1fr; }
+  .camera-wrap { grid-template-columns: 1fr; gap: 3rem; }
+  .gallery-wrap { columns: 2; }
+  .hero-bottom { flex-direction: column; align-items: flex-start; }
+  footer { flex-direction: column; gap: 0.8rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<nav id="nav">
+  <a href="#hero" class="nav-logo">EK</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#camera">Camera</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero" style="border:none">
+  <div class="hero-noise"></div>
+  <div class="hero-line"></div>
+  <div class="hero-status">
+    <span class="status-dot"></span>
+    <span>Available for opportunities</span>
+  </div>
+  <h1>
+    Eunchan<br>
+    <span class="accent-word">Kim</span>
+  </h1>
+  <div class="hero-bottom">
+    <p class="hero-desc">Backend developer in the making. Building systems that matter — clean APIs, optimized databases, code that scales. High school, big ambitions.</p>
+    <div class="hero-cta-group">
+      <a href="https://github.com/" target="_blank" class="cta-btn" id="link-github">
+        <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        <span>GitHub</span>
+      </a>
+      <a href="https://instagram.com/" target="_blank" class="cta-btn" id="link-instagram">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        <span>Instagram</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="sec-eyebrow">about me</div>
+  <h2>Who I am</h2>
+  <div class="about-cols fade-in">
+    <div class="about-text" id="about-display">
+      <p>I'm a high school student in Korea building toward a career in <strong>backend development</strong>. I care about systems that are fast, secure, and built to last.</p>
+      <p>Led my school coding club as <strong>lead developer</strong> — learned that shipping real products beats tutorial loops every time.</p>
+      <p>Long-term goal: backend engineer or architect at a large-scale tech company. Short-term: keep shipping and keep learning.</p>
+      <div class="about-tags">
+        <span class="about-tag">PHP</span>
+        <span class="about-tag">MySQL</span>
+        <span class="about-tag">API Design</span>
+        <span class="about-tag">Data Security</span>
+        <span class="about-tag">Team Lead</span>
+        <span class="about-tag">Photography</span>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-num">3+</div>
+        <div class="stat-label">Real Projects Shipped</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Languages in Stack</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Ambition</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">1</div>
+        <div class="stat-label">Camera, Always Ready</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="sec-eyebrow">tech stack</div>
+  <h2>Skills</h2>
+  <div class="skills-list fade-in" id="skills-list"></div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="sec-eyebrow">selected work</div>
+  <h2>Projects</h2>
+  <div class="projects-grid fade-in" id="projects-grid"></div>
+</section>
+
+<!-- CAMERA -->
+<section id="camera">
+  <div class="sec-eyebrow">gear</div>
+  <h2>Camera</h2>
+  <div class="camera-wrap fade-in">
+    <div>
+      <div class="cam-model-big">A7M4</div>
+      <div class="cam-brand">Sony Alpha</div>
+      <table class="spec-table">
+        <tr><td>Sensor</td><td>33MP Full-Frame BSI CMOS</td></tr>
+        <tr><td>ISO</td><td>100 – 51,200</td></tr>
+        <tr><td>Autofocus</td><td>759-point Phase Detection</td></tr>
+        <tr><td>Video</td><td>4K 60fps · 10-bit S-Log3</td></tr>
+        <tr><td>Stabilization</td><td>5-axis IBIS (5.5 stops)</td></tr>
+        <tr><td>Storage</td><td>CFexpress A + SD Dual Slot</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="sec-eyebrow" style="margin-bottom:1.5rem">lenses</div>
+      <div class="lenses-wrap">
+        <div class="lens-row">
+          <div class="lens-icon"></div>
+          <div>
+            <div class="lens-name">Sony FE 24–105mm f/4 G OSS</div>
+            <div class="lens-note">All-rounder — street to portrait</div>
+          </div>
+        </div>
+        <div class="lens-row">
+          <div class="lens-icon"></div>
+          <div>
+            <div class="lens-name">Tamron 70–180mm f/2.8 Di III VXD</div>
+            <div class="lens-note">Telephoto — events & compression</div>
+          </div>
+        </div>
+        <div class="lens-row">
+          <div class="lens-icon"></div>
+          <div>
+            <div class="lens-name">Zeiss Loxia 55mm f/2 Planar</div>
+            <div class="lens-note">Prime — everyday & low light</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="sec-eyebrow">through the lens</div>
+  <h2>Gallery</h2>
+  <div class="gallery-wrap" id="gallery-wrap">
+    <div class="gallery-empty-msg" id="gallery-empty">// no photos yet — add them in admin panel</div>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb">
+  <div class="lb-inner">
+    <button class="lb-close" onclick="closeLb()">[ esc to close ]</button>
+    <img id="lb-img" src="" alt="">
+    <div class="lb-meta">
+      <span style="color:var(--accent);font-size:0.62rem;font-family:'Fira Code',monospace" id="lb-loc"></span>
+      <span style="color:var(--sub);font-size:0.62rem;font-family:'Fira Code',monospace" id="lb-date"></span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span class="foot-name">Eunchan Kim</span>
+  <span class="foot-copy">© 2025</span>
+</footer>
+
+<a href="admin.html" class="admin-float">// admin</a>
+
+<script>
+// CURSOR
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0, my=0, rx=0, ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cur.style.left=mx+'px'; cur.style.top=my+'px'; });
+function animRing() { rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); }
+animRing();
+document.querySelectorAll('a,button').forEach(el => {
+  el.addEventListener('mouseenter', () => { ring.style.width='48px'; ring.style.height='48px'; ring.style.borderColor='var(--accent)'; });
+  el.addEventListener('mouseleave', () => { ring.style.width='32px'; ring.style.height='32px'; ring.style.borderColor='rgba(184,255,87,0.4)'; });
+});
+
+// NAV SCROLL
+window.addEventListener('scroll', () => document.getElementById('nav').classList.toggle('scrolled', scrollY > 60));
+
+// STORAGE
+function load(k,d){ try{const v=localStorage.getItem(k); return v?JSON.parse(v):d;}catch{return d;} }
+
+// SKILLS
+const SKILLS_DEF = [
+  {name:'Python',level:65,label:'Intermediate'},
+  {name:'C',level:55,label:'Intermediate'},
+  {name:'SQL',level:70,label:'Intermediate'},
+  {name:'PHP',level:60,label:'Intermediate'},
+];
+function renderSkills(){
+  const skills = load('skills', SKILLS_DEF);
+  document.getElementById('skills-list').innerHTML = skills.map(s=>`
+    <div class="skill-row">
+      <div class="skill-name-s">${s.name}</div>
+      <div class="skill-track"><div class="skill-fill-s" data-w="${s.level}%"></div></div>
+      <div class="skill-pct">${s.level}%</div>
+    </div>
+  `).join('');
+  setTimeout(() => document.querySelectorAll('.skill-fill-s').forEach(el => el.style.width = el.dataset.w), 200);
+}
+
+// PROJECTS
+const PROJ_DEF = [
+  {name:'Emergency Medical System',desc:'Ambulance-hospital matching platform — PHP + MySQL backend to reduce transport time and boost survival rates.',tags:['PHP','MySQL','Database','API'],link:''},
+  {name:'High School Timetable App',desc:'Practical scheduling app for daily student use. Real product, not a school assignment.',tags:['App Inventor','PHP','SQL'],link:''},
+  {name:'Secure Data Encryption',desc:'AES_ENCRYPT + HEX-based pipeline for sensitive field encryption. Phone numbers, IDs — secured properly.',tags:['PHP','MySQL','Security','Encryption'],link:''},
+];
+function renderProjects(){
+  const projects = load('projects', PROJ_DEF);
+  document.getElementById('projects-grid').innerHTML = projects.map((p,i)=>`
+    <div class="proj-card" ${p.link?`onclick="window.open('${p.link}','_blank')" style="cursor:pointer"`:''}>
+      <div class="proj-idx">${String(i+1).padStart(2,'0')}</div>
+      <div class="proj-title">${p.name}</div>
+      <div class="proj-desc">${p.desc}</div>
+      <div class="proj-chips">${p.tags.map(t=>`<span class="chip">${t}</span>`).join('')}</div>
+    </div>
+  `).join('');
+}
+
+// GALLERY
+let photos = [];
+function renderGallery(){
+  photos = load('photos', []);
+  const wrap = document.getElementById('gallery-wrap');
+  const empty = document.getElementById('gallery-empty');
+  if(!photos.length){ if(empty) empty.style.display='block'; return; }
+  wrap.innerHTML = photos.map((p,i)=>`
+    <div class="gal-item" onclick="openLb(${i})">
+      <img src="${p.src}" alt="${p.location}" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-loc">${p.location}</div>
+        <div class="gal-date">${p.date}</div>
+      </div>
+    </div>
+  `).join('');
+}
+function openLb(i){ const p=photos[i]; document.getElementById('lb-img').src=p.src; document.getElementById('lb-loc').textContent=p.location; document.getElementById('lb-date').textContent=p.date; document.getElementById('lb').classList.add('open'); }
+function closeLb(){ document.getElementById('lb').classList.remove('open'); }
+document.getElementById('lb').addEventListener('click', e => { if(e.target===document.getElementById('lb')) closeLb(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeLb(); });
+
+// SOCIAL
+function renderSocial(){
+  const cfg = load('config', {});
+  if(cfg.github) document.getElementById('link-github').href = cfg.github;
+  if(cfg.instagram) document.getElementById('link-instagram').href = cfg.instagram;
+}
+
+// ABOUT
+function renderAbout(){
+  const cfg = load('config', {});
+  if(cfg.aboutText){
+    const el = document.getElementById('about-display');
+    const tags = el.querySelector('.about-tags');
+    const tagsHTML = tags ? tags.outerHTML : '';
+    el.innerHTML = cfg.aboutText.split('\n').filter(Boolean).map(p=>`<p>${p}</p>`).join('') + tagsHTML;
+  }
+}
+
+// FADE IN
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+renderSkills(); renderProjects(); renderGallery(); renderSocial(); renderAbout();
+</script>
+</body>
+</html>
