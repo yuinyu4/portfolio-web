@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="김은찬 포트폴리오">
+<title>김은찬 — Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500&family=Fira+Code:wght@300;400&display=swap" rel="stylesheet">
+<style>
+/* ── 변수 ── */
+:root {
+  --bg: #080808;
+  --bg1: #0f0f0f;
+  --bg2: #161616;
+  --text: #f0ede8;
+  --sub: #5c5a57;
+  --accent: #b8ff57;
+  --accent-dim: rgba(184,255,87,0.1);
+  --border: rgba(255,255,255,0.07);
+  --border-h: rgba(184,255,87,0.28);
+}
+
+/* ── 리셋 ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── 커스텀 커서 (데스크탑만) ── */
+@media (pointer: fine) {
+  body { cursor: none; }
+  .cursor {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.05s;
+  }
+  .cursor-ring {
+    width: 32px; height: 32px;
+    border: 1px solid rgba(184,255,87,0.4);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s, height 0.2s, border-color 0.2s;
+  }
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.5rem 3rem;
+  transition: background 0.3s, border-color 0.3s;
+  border-bottom: 1px solid transparent;
+}
+nav.scrolled {
+  background: rgba(8,8,8,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom-color: var(--border);
+}
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 1rem;
+  color: var(--accent); text-decoration: none;
+  letter-spacing: -0.02em;
+}
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a {
+  font-size: 0.78rem; color: var(--sub);
+  text-decoration: none; transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+
+/* ── HERO ── */
+#hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 3rem 5rem;
+  position: relative;
+}
+.hero-line {
+  position: absolute; top: 0; left: 3rem;
+  width: 1px; height: 100%;
+  background: linear-gradient(to bottom, transparent, var(--border) 30%, var(--border) 70%, transparent);
+  pointer-events: none;
+}
+.status-row {
+  display: flex; align-items: center; gap: 0.6rem;
+  margin-bottom: 2.5rem;
+  font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--sub);
+}
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(3.2rem, 9vw, 8.5rem);
+  line-height: 0.93;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 2.5rem;
+}
+h1 .aw { color: var(--accent); }
+
+.hero-bottom {
+  display: flex; align-items: flex-end;
+  justify-content: space-between; gap: 2rem;
+}
+.hero-desc {
+  max-width: 380px; font-size: 0.88rem;
+  color: var(--sub); line-height: 1.85;
+  word-break: keep-all;
+}
+.hero-btns { display: flex; gap: 0.75rem; flex-shrink: 0; flex-wrap: wrap; }
+.hero-btn {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.7rem 1.3rem;
+  font-size: 0.76rem; font-weight: 400;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  color: var(--sub);
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.hero-btn:hover { color: var(--accent); border-color: var(--border-h); background: var(--accent-dim); }
+.hero-btn svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
+
+/* ── SECTION 공통 ── */
+section { padding: 6.5rem 3rem; border-top: 1px solid var(--border); }
+.eyebrow {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.63rem; color: var(--accent);
+  letter-spacing: 0.15em; margin-bottom: 2.5rem;
+  display: flex; align-items: center; gap: 0.7rem;
+}
+.eyebrow::before { content: '//'; color: var(--sub); }
+h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.9rem, 4.5vw, 3.8rem);
+  letter-spacing: -0.02em;
+  color: var(--text); line-height: 1;
+  margin-bottom: 3.5rem;
+  word-break: keep-all;
+}
+
+/* ── ABOUT ── */
+.about-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+.about-text p { font-size: 0.9rem; color: var(--sub); line-height: 1.9; margin-bottom: 1.1rem; word-break: keep-all; }
+.about-text p strong { color: var(--text); font-weight: 400; }
+.about-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 1.8rem; }
+.about-tag {
+  font-family: 'Fira Code', monospace; font-size: 0.62rem;
+  color: var(--sub); border: 1px solid var(--border);
+  padding: 0.28rem 0.75rem; transition: all 0.2s;
+}
+.about-tag:hover { color: var(--accent); border-color: var(--border-h); background: var(--accent-dim); }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+.stat-box { background: var(--bg1); padding: 1.8rem; }
+.stat-num {
+  font-family: 'Syne', sans-serif; font-size: 2.4rem;
+  font-weight: 800; color: var(--accent);
+  letter-spacing: -0.04em; line-height: 1; margin-bottom: 0.4rem;
+}
+.stat-label { font-size: 0.73rem; color: var(--sub); }
+
+/* ── SKILLS ── */
+.skills-list { display: flex; flex-direction: column; max-width: 680px; }
+.skill-row {
+  display: grid; grid-template-columns: 120px 1fr 48px;
+  align-items: center; gap: 1.8rem;
+  padding: 1.3rem 0; border-bottom: 1px solid var(--border);
+}
+.skill-row:first-child { border-top: 1px solid var(--border); }
+.skill-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.88rem; color: var(--text); }
+.skill-track { height: 2px; background: var(--border); position: relative; overflow: hidden; border-radius: 1px; }
+.skill-fill {
+  position: absolute; top: 0; left: 0; height: 100%;
+  background: var(--accent); width: 0%;
+  transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.skill-pct { font-family: 'Fira Code', monospace; font-size: 0.68rem; color: var(--sub); text-align: right; }
+
+/* ── PROJECTS ── */
+.projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+.proj-card {
+  background: var(--bg1); padding: 2.2rem;
+  transition: background 0.2s; position: relative; overflow: hidden;
+}
+.proj-card::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--accent);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.proj-card:hover { background: var(--bg2); }
+.proj-card:hover::after { transform: scaleX(1); }
+.proj-idx { font-family: 'Fira Code', monospace; font-size: 0.6rem; color: var(--sub); margin-bottom: 1.3rem; }
+.proj-title {
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 1.15rem; letter-spacing: -0.02em;
+  color: var(--text); margin-bottom: 0.7rem; word-break: keep-all;
+}
+.proj-desc { font-size: 0.8rem; color: var(--sub); line-height: 1.75; margin-bottom: 1.8rem; word-break: keep-all; }
+.proj-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.chip {
+  font-family: 'Fira Code', monospace; font-size: 0.58rem;
+  color: var(--accent); background: var(--accent-dim); padding: 0.22rem 0.6rem;
+}
+
+/* ── CAMERA ── */
+.camera-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+.cam-model {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(2.8rem, 6vw, 5.5rem);
+  letter-spacing: -0.04em; color: var(--text); line-height: 0.9; margin-bottom: 0.4rem;
+}
+.cam-brand {
+  font-family: 'Fira Code', monospace; font-size: 0.62rem;
+  color: var(--accent); letter-spacing: 0.2em; margin-bottom: 2.5rem;
+}
+.spec-table { width: 100%; border-collapse: collapse; }
+.spec-table tr { border-bottom: 1px solid var(--border); }
+.spec-table td { padding: 0.9rem 0; font-size: 0.8rem; }
+.spec-table td:first-child { color: var(--sub); width: 44%; }
+.lenses { display: flex; flex-direction: column; gap: 1px; background: var(--border); margin-top: 1.8rem; }
+.lens-item {
+  background: var(--bg1); padding: 1.2rem 1.4rem;
+  display: flex; align-items: flex-start; gap: 0.9rem;
+  transition: background 0.2s;
+}
+.lens-item:hover { background: var(--bg2); }
+.lens-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 0.45rem; }
+.lens-name { font-size: 0.82rem; color: var(--text); margin-bottom: 0.15rem; }
+.lens-note { font-size: 0.7rem; color: var(--sub); }
+
+/* ── GALLERY ── */
+.gallery-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 2px; background: var(--border);
+}
+.gal-item {
+  background: var(--bg1); position: relative;
+  overflow: hidden; aspect-ratio: 1;
+}
+.gal-item img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gal-item:hover img { transform: scale(1.05); }
+.gal-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(8,8,8,0.82), transparent 55%);
+  padding: 1rem; display: flex; flex-direction: column; justify-content: flex-end;
+  opacity: 0; transition: opacity 0.25s;
+}
+.gal-item:hover .gal-overlay { opacity: 1; }
+.gal-loc { font-family: 'Fira Code', monospace; font-size: 0.6rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; }
+.gal-date { font-size: 0.68rem; color: var(--sub); margin-top: 0.18rem; }
+
+/* 인스타 임베드 */
+.gal-item.ig-type { cursor: pointer; }
+.gal-item.ig-type iframe { width: 100%; height: 100%; border: none; pointer-events: none; }
+.ig-hover {
+  position: absolute; inset: 0; z-index: 2;
+  background: rgba(8,8,8,0.55);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.25s;
+}
+.gal-item.ig-type:hover .ig-hover { opacity: 1; }
+.ig-hover svg { width: 22px; height: 22px; fill: var(--accent); }
+.ig-badge {
+  position: absolute; top: 0.6rem; right: 0.6rem; z-index: 3;
+  font-family: 'Fira Code', monospace; font-size: 0.5rem;
+  color: var(--accent); background: rgba(8,8,8,0.8);
+  border: 1px solid var(--border-h); padding: 0.18rem 0.45rem;
+}
+.gal-empty {
+  grid-column: 1 / -1;
+  font-family: 'Fira Code', monospace; font-size: 0.68rem;
+  color: var(--sub); padding: 4rem 1rem; text-align: center; letter-spacing: 0.08em;
+}
+
+/* ── LIGHTBOX ── */
+.lb {
+  position: fixed; inset: 0; z-index: 9990;
+  background: rgba(8,8,8,0.96);
+  display: none; align-items: center; justify-content: center;
+}
+.lb.open { display: flex; }
+.lb-box { max-width: 88vw; position: relative; }
+.lb-box img { max-height: 80vh; max-width: 100%; display: block; object-fit: contain; }
+.lb-meta { display: flex; justify-content: space-between; padding: 0.7rem 0; }
+.lb-meta span { font-family: 'Fira Code', monospace; font-size: 0.6rem; }
+.lb-close {
+  position: absolute; top: -2.4rem; right: 0;
+  background: none; border: none; color: var(--sub);
+  font-family: 'Fira Code', monospace; font-size: 0.68rem;
+  cursor: pointer; transition: color 0.2s;
+}
+.lb-close:hover { color: var(--accent); }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2.2rem 3rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.foot-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; }
+.foot-copy { font-family: 'Fira Code', monospace; font-size: 0.58rem; color: var(--sub); }
+
+/* ── ADMIN 버튼 ── */
+.admin-link {
+  position: fixed; bottom: 1.8rem; right: 1.8rem; z-index: 50;
+  background: var(--bg2); border: 1px solid var(--border);
+  color: var(--sub); padding: 0.55rem 0.95rem;
+  font-family: 'Fira Code', monospace; font-size: 0.58rem;
+  text-decoration: none; letter-spacing: 0.1em; transition: all 0.2s;
+}
+.admin-link:hover { color: var(--accent); border-color: var(--border-h); }
+
+/* ── 페이드인 ── */
+.fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* ── 반응형 ── */
+@media (max-width: 768px) {
+  nav { padding: 1.1rem 1.4rem; }
+  .nav-links { gap: 1.1rem; }
+  .nav-links a { font-size: 0.72rem; }
+  section { padding: 4.5rem 1.4rem; }
+  #hero { padding: 0 1.4rem 3.5rem; }
+  .hero-line { left: 1.4rem; }
+  h1 { font-size: clamp(2.6rem, 13vw, 5rem); letter-spacing: -0.01em; }
+  h2 { letter-spacing: -0.01em; }
+  .hero-bottom { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+  .about-cols { grid-template-columns: 1fr; gap: 2.5rem; }
+  .projects-grid { grid-template-columns: 1fr; }
+  .camera-wrap { grid-template-columns: 1fr; gap: 2.5rem; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  footer { flex-direction: column; gap: 0.7rem; text-align: center; }
+  .skill-row { grid-template-columns: 100px 1fr 42px; gap: 1.2rem; }
+}
+@media (max-width: 480px) {
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-btns { flex-direction: column; width: 100%; }
+  .hero-btn { justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">EK</a>
+  <ul class="nav-links">
+    <li><a href="#about">소개</a></li>
+    <li><a href="#skills">기술</a></li>
+    <li><a href="#projects">프로젝트</a></li>
+    <li><a href="#camera">카메라</a></li>
+    <li><a href="#gallery">갤러리</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero" style="border:none">
+  <div class="hero-line"></div>
+  <div class="status-row">
+    <span class="status-dot"></span>
+    <span>기회를 찾고 있어요</span>
+  </div>
+  <h1>Eunchan<br><span class="aw">Kim</span></h1>
+  <div class="hero-bottom">
+    <p class="hero-desc">백엔드 개발자를 꿈꾸는 고등학생. 빠르고, 안전하고, 확장 가능한 시스템을 만들어요. 코드 바깥에선 카메라를 들고 다녀요.</p>
+    <div class="hero-btns">
+      <a href="#" class="hero-btn" id="link-github" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+      </a>
+      <a href="#" class="hero-btn" id="link-instagram" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        Instagram
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="eyebrow">about me</div>
+  <h2>저는 이런 사람이에요</h2>
+  <div class="about-cols fade-in">
+    <div class="about-text" id="about-display">
+      <p>한국에서 <strong>백엔드 개발</strong>을 향해 달려가는 고등학생이에요. 빠르고 안전하고 오래가는 시스템을 만드는 게 목표예요.</p>
+      <p>학교 코딩 클럽에서 <strong>리드 개발자</strong>를 맡으며 배운 것 — 튜토리얼보다 실제로 뭔가를 만들어 배포하는 게 훨씬 낫다는 거.</p>
+      <p>장기 목표는 대형 IT 기업의 백엔드 엔지니어 또는 아키텍트. 지금은 계속 만들고, 계속 배우는 중이에요.</p>
+      <div class="about-tags">
+        <span class="about-tag">PHP</span>
+        <span class="about-tag">MySQL</span>
+        <span class="about-tag">API Design</span>
+        <span class="about-tag">Data Security</span>
+        <span class="about-tag">Team Lead</span>
+        <span class="about-tag">Photography</span>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-num">3+</div><div class="stat-label">실제 출시한 프로젝트</div></div>
+      <div class="stat-box"><div class="stat-num">4</div><div class="stat-label">사용 언어</div></div>
+      <div class="stat-box"><div class="stat-num">∞</div><div class="stat-label">야망</div></div>
+      <div class="stat-box"><div class="stat-num">1</div><div class="stat-label">항상 들고 다니는 카메라</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="eyebrow">tech stack</div>
+  <h2>기술 스택</h2>
+  <div class="skills-list fade-in" id="skills-list"></div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="eyebrow">selected work</div>
+  <h2>프로젝트</h2>
+  <div class="projects-grid fade-in" id="projects-grid"></div>
+</section>
+
+<!-- CAMERA -->
+<section id="camera">
+  <div class="eyebrow">gear</div>
+  <h2>카메라</h2>
+  <div class="camera-wrap fade-in">
+    <div>
+      <div class="cam-model">A7M4</div>
+      <div class="cam-brand">Sony Alpha</div>
+      <table class="spec-table">
+        <tr><td>센서</td><td>33MP Full-Frame BSI CMOS</td></tr>
+        <tr><td>ISO</td><td>100 – 51,200</td></tr>
+        <tr><td>오토포커스</td><td>759-point Phase Detection</td></tr>
+        <tr><td>동영상</td><td>4K 60fps · 10-bit S-Log3</td></tr>
+        <tr><td>손떨림 보정</td><td>5-axis IBIS (5.5 stops)</td></tr>
+        <tr><td>저장 슬롯</td><td>CFexpress A + SD Dual Slot</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="eyebrow" style="margin-bottom:1.4rem">lenses</div>
+      <div class="lenses">
+        <div class="lens-item">
+          <div class="lens-dot"></div>
+          <div><div class="lens-name">Sony FE 24–105mm f/4 G OSS</div><div class="lens-note">스트리트부터 인물까지 — 올라운더</div></div>
+        </div>
+        <div class="lens-item">
+          <div class="lens-dot"></div>
+          <div><div class="lens-name">Tamron 70–180mm f/2.8 Di III VXD</div><div class="lens-note">망원 — 행사 & 압축감</div></div>
+        </div>
+        <div class="lens-item">
+          <div class="lens-dot"></div>
+          <div><div class="lens-name">Zeiss Loxia 55mm f/2 Planar</div><div class="lens-note">단렌즈 — 일상 & 저조도</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="eyebrow">through the lens</div>
+  <h2>갤러리</h2>
+  <div class="gallery-grid" id="gallery-grid">
+    <div class="gal-empty">// 아직 사진이 없어요 — 관리자 페이지에서 추가해주세요</div>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb">
+  <div class="lb-box">
+    <button class="lb-close" onclick="closeLb()">[ ESC 닫기 ]</button>
+    <img id="lb-img" src="" alt="">
+    <div class="lb-meta">
+      <span style="color:var(--accent)" id="lb-loc"></span>
+      <span style="color:var(--sub)" id="lb-date"></span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span class="foot-name">Eunchan Kim</span>
+  <span class="foot-copy">© 2025</span>
+</footer>
+
+<a href="admin.html" class="admin-link">// 관리자</a>
+
+<script>
+// ── 커서 (데스크탑만) ──────────────────────────────────────────
+const curEl  = document.getElementById('cursor');
+const ringEl = document.getElementById('cursor-ring');
+if (curEl && window.matchMedia('(pointer: fine)').matches) {
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    curEl.style.left = mx+'px'; curEl.style.top = my+'px';
+  });
+  (function animRing(){
+    rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
+    ringEl.style.left = rx+'px'; ringEl.style.top = ry+'px';
+    requestAnimationFrame(animRing);
+  })();
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ringEl.style.width='44px'; ringEl.style.height='44px';
+      ringEl.style.borderColor='var(--accent)';
+    });
+    el.addEventListener('mouseleave', () => {
+      ringEl.style.width='32px'; ringEl.style.height='32px';
+      ringEl.style.borderColor='rgba(184,255,87,0.4)';
+    });
+  });
+}
+
+// ── 스크롤 nav ─────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// ── localStorage 유틸 ──────────────────────────────────────────
+function dbGet(key) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; }
+  catch(e) { console.warn('dbGet failed:', key, e); return null; }
+}
+
+// ── 스킬 렌더 ──────────────────────────────────────────────────
+const SK_DEFAULT = [
+  { name:'Python', level:65, label:'중급' },
+  { name:'C',      level:55, label:'중급' },
+  { name:'SQL',    level:70, label:'중급' },
+  { name:'PHP',    level:60, label:'중급' },
+];
+function renderSkills() {
+  const list = dbGet('skills') || SK_DEFAULT;
+  document.getElementById('skills-list').innerHTML = list.map(s => `
+    <div class="skill-row">
+      <div class="skill-name">${s.name}</div>
+      <div class="skill-track"><div class="skill-fill" data-w="${s.level}"></div></div>
+      <div class="skill-pct">${s.level}%</div>
+    </div>`).join('');
+  // 트랙 애니메이션
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.skill-fill').forEach(el => {
+      el.style.width = el.dataset.w + '%';
+    });
+  });
+}
+
+// ── 프로젝트 렌더 ──────────────────────────────────────────────
+const PJ_DEFAULT = [
+  { name:'응급의료 종합 시스템', desc:'구급차-병원 매칭 플랫폼 — PHP + MySQL 백엔드로 이송 시간 단축 및 생존율 향상.', tags:['PHP','MySQL','Database','API'], link:'' },
+  { name:'고등학교 시간표 앱', desc:'실제로 쓰려고 만든 시간표 앱. 학교 과제가 아닌 실용 목적의 프로덕트.', tags:['App Inventor','PHP','SQL'], link:'' },
+  { name:'데이터 보안 암호화 시스템', desc:'AES_ENCRYPT + HEX 기반 민감 정보 암호화 파이프라인. 전화번호, 주민등록번호 안전하게.', tags:['PHP','MySQL','Security','Encryption'], link:'' },
+];
+function renderProjects() {
+  const list = dbGet('projects') || PJ_DEFAULT;
+  document.getElementById('projects-grid').innerHTML = list.map((p, i) => `
+    <div class="proj-card" ${p.link ? `onclick="window.open('${p.link}','_blank')" style="cursor:pointer"` : ''}>
+      <div class="proj-idx">${String(i+1).padStart(2,'0')}</div>
+      <div class="proj-title">${p.name}</div>
+      <div class="proj-desc">${p.desc}</div>
+      <div class="proj-chips">${(p.tags||[]).map(t=>`<span class="chip">${t}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+// ── 갤러리 렌더 (사진 + 인스타 통합) ─────────────────────────
+let uploadedPhotos = [];
+function renderGallery() {
+  uploadedPhotos = dbGet('photos') || [];
+  const insta    = dbGet('insta_posts') || [];
+  const grid     = document.getElementById('gallery-grid');
+
+  if (!uploadedPhotos.length && !insta.length) {
+    grid.innerHTML = '<div class="gal-empty">// 아직 사진이 없어요 — 관리자 페이지에서 추가해주세요</div>';
+    return;
+  }
+
+  const photoHTML = uploadedPhotos.map((p, i) => `
+    <div class="gal-item" onclick="openLb(${i})" style="cursor:pointer">
+      <img src="${p.src}" alt="${p.location}" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-loc">${p.location}</div>
+        <div class="gal-date">${p.date}</div>
+      </div>
+    </div>`).join('');
+
+  const instaHTML = insta.map(p => `
+    <div class="gal-item ig-type" onclick="window.open('${p.url}','_blank')">
+      <span class="ig-badge">IG</span>
+      <iframe src="${p.embedUrl}" scrolling="no" allowtransparency="true" loading="lazy"></iframe>
+      <div class="ig-hover">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </div>
+    </div>`).join('');
+
+  grid.innerHTML = photoHTML + instaHTML;
+}
+
+// ── 라이트박스 ─────────────────────────────────────────────────
+function openLb(i) {
+  const p = uploadedPhotos[i];
+  if (!p) return;
+  document.getElementById('lb-img').src = p.src;
+  document.getElementById('lb-loc').textContent = p.location;
+  document.getElementById('lb-date').textContent = p.date;
+  document.getElementById('lb').classList.add('open');
+}
+function closeLb() { document.getElementById('lb').classList.remove('open'); }
+document.getElementById('lb').addEventListener('click', e => {
+  if (e.target === document.getElementById('lb')) closeLb();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
+
+// ── 소셜 링크 ──────────────────────────────────────────────────
+function renderSocial() {
+  const cfg = dbGet('config') || {};
+  const gh  = document.getElementById('link-github');
+  const ig  = document.getElementById('link-instagram');
+  if (cfg.github && gh)    gh.href = cfg.github;
+  if (cfg.instagram && ig) ig.href = cfg.instagram;
+}
+
+// ── About 텍스트 ───────────────────────────────────────────────
+function renderAbout() {
+  const cfg = dbGet('config') || {};
+  if (!cfg.aboutText) return;
+  const el = document.getElementById('about-display');
+  const tagsEl = el.querySelector('.about-tags');
+  const tagsHTML = tagsEl ? tagsEl.outerHTML : '';
+  el.innerHTML = cfg.aboutText
+    .split('\n').filter(Boolean)
+    .map(p => `<p>${p}</p>`).join('') + tagsHTML;
+}
+
+// ── 페이드인 Observer ──────────────────────────────────────────
+function initFadeIn() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+}
+
+// ── 초기화 (렌더 먼저, fade-in 나중) ─────────────────────────
+renderSkills();
+renderProjects();
+renderGallery();
+renderSocial();
+renderAbout();
+initFadeIn();
+</script>
+</body>
+</html>

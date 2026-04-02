@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 — EK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500&family=Fira+Code:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080808; --bg1:#0f0f0f; --bg2:#161616;
+  --text:#f0ede8; --sub:#5c5a57;
+  --accent:#b8ff57; --accent-dim:rgba(184,255,87,0.1);
+  --border:rgba(255,255,255,0.07); --border-h:rgba(184,255,87,0.28);
+  --danger:#ff4444; --danger-dim:rgba(255,68,68,0.1);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Outfit',sans-serif; font-weight:300; min-height:100vh; -webkit-font-smoothing:antialiased; }
+
+/* ── 로그인 ── */
+#login { min-height:100vh; display:flex; align-items:center; justify-content:center; }
+.login-card { width:360px; border:1px solid var(--border); background:var(--bg1); padding:2.8rem; }
+.login-eye { font-family:'Fira Code',monospace; font-size:.6rem; color:var(--sub); letter-spacing:.2em; margin-bottom:.4rem; }
+.login-eye::before { content:'// '; }
+.login-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1.75rem; letter-spacing:-.03em; margin-bottom:2.2rem; }
+.err-msg { font-family:'Fira Code',monospace; font-size:.6rem; color:var(--danger); margin-top:.4rem; margin-bottom:.6rem; display:none; }
+
+/* ── 입력 ── */
+label { font-family:'Fira Code',monospace; font-size:.58rem; color:var(--sub); letter-spacing:.14em; display:block; margin-bottom:.4rem; margin-top:1rem; }
+label:first-of-type { margin-top:0; }
+input[type=text], input[type=password], input[type=url], input[type=date], textarea {
+  width:100%; background:var(--bg2); border:1px solid var(--border); color:var(--text);
+  padding:.72rem 1rem; font-family:'Outfit',sans-serif; font-size:.86rem; font-weight:300;
+  outline:none; transition:border-color .2s; display:block;
+}
+input:focus, textarea:focus { border-color:var(--border-h); }
+textarea { min-height:88px; resize:vertical; }
+input[type=file] { width:100%; color:var(--sub); font-size:.78rem; padding:.35rem 0; }
+input[type=range] { width:100%; accent-color:var(--accent); display:block; margin:.35rem 0; }
+
+/* ── 버튼 ── */
+.btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  background:none; border:1px solid var(--border); color:var(--sub);
+  padding:.68rem 1.3rem; font-family:'Fira Code',monospace; font-size:.6rem;
+  letter-spacing:.1em; cursor:pointer; transition:color .2s, border-color .2s, background .2s;
+  margin-top:.9rem;
+}
+.btn:hover { color:var(--accent); border-color:var(--border-h); background:var(--accent-dim); }
+.btn-full { width:100%; display:flex; }
+.btn-sm { padding:.32rem .7rem; font-size:.54rem; margin-top:0; }
+.btn-danger { border-color:rgba(255,68,68,.18); color:#8a6655; }
+.btn-danger:hover { color:var(--danger); border-color:rgba(255,68,68,.45); background:var(--danger-dim); }
+.btn-row { display:flex; gap:.6rem; margin-top:.9rem; flex-wrap:wrap; }
+
+/* ── 어드민 레이아웃 ── */
+#admin { display:none; }
+.topbar {
+  position:sticky; top:0; z-index:100;
+  background:rgba(8,8,8,.94); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 2rem;
+}
+.topbar-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:.88rem; color:var(--accent); padding:1.1rem 0; }
+.tabbar { display:flex; overflow-x:auto; }
+.tabbar::-webkit-scrollbar { display:none; }
+.tbtn {
+  background:none; border:none; border-bottom:2px solid transparent;
+  color:var(--sub); padding:1.1rem .85rem;
+  font-family:'Fira Code',monospace; font-size:.58rem; letter-spacing:.08em;
+  cursor:pointer; transition:color .2s, border-color .2s; white-space:nowrap;
+}
+.tbtn:hover { color:var(--text); }
+.tbtn.on { color:var(--accent); border-bottom-color:var(--accent); }
+.logout-btn {
+  background:none; border:1px solid var(--border); color:var(--sub);
+  padding:.32rem .75rem; font-family:'Fira Code',monospace; font-size:.54rem;
+  letter-spacing:.08em; cursor:pointer; transition:all .2s; white-space:nowrap;
+}
+.logout-btn:hover { color:var(--danger); border-color:rgba(255,68,68,.4); }
+
+.wrap { max-width:840px; margin:0 auto; padding:2.4rem 1.8rem; }
+.panel { display:none; }
+.panel.on { display:block; }
+
+/* ── 섹션 제목 ── */
+.stitle {
+  font-family:'Fira Code',monospace; font-size:.58rem; color:var(--accent);
+  letter-spacing:.18em; display:flex; align-items:center; gap:.6rem;
+  padding-bottom:.75rem; margin-bottom:1.4rem; border-bottom:1px solid var(--border);
+}
+.stitle::before { content:'//'; color:var(--sub); }
+
+/* ── 카드 ── */
+.card { border:1px solid var(--border); background:var(--bg1); padding:1.7rem; margin-bottom:1.4rem; }
+.card-note { font-family:'Fira Code',monospace; font-size:.56rem; color:var(--sub); letter-spacing:.08em; margin-bottom:1.1rem; line-height:1.65; }
+.row2 { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
+.range-row { display:flex; align-items:center; gap:.9rem; }
+.rval { font-family:'Fira Code',monospace; font-size:.68rem; color:var(--accent); min-width:36px; text-align:right; }
+.prev-img { width:100%; max-height:190px; object-fit:cover; margin-top:.7rem; border:1px solid var(--border); display:none; }
+.ig-prev { margin-top:.75rem; display:none; }
+.ig-prev iframe { width:100%; max-width:390px; height:440px; border:none; display:block; }
+
+/* ── 리스트 ── */
+.lw { margin-bottom:1.8rem; }
+.li {
+  display:flex; align-items:center; gap:.9rem;
+  border:1px solid var(--border); background:var(--bg1);
+  padding:.95rem 1.2rem; margin-bottom:2px; transition:background .15s;
+}
+.li:hover { background:var(--bg2); }
+.li-thumb { width:66px; height:48px; object-fit:cover; border:1px solid var(--border); flex-shrink:0; background:var(--bg2); }
+.li-ig { width:66px; height:48px; border:1px solid var(--border); flex-shrink:0; background:var(--bg2); display:flex; align-items:center; justify-content:center; font-family:'Fira Code',monospace; font-size:.52rem; color:var(--accent); }
+.li-info { flex:1; min-width:0; }
+.li-name { font-size:.86rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:.14rem; }
+.li-sub { font-family:'Fira Code',monospace; font-size:.56rem; color:var(--sub); }
+.li-acts { display:flex; gap:.35rem; flex-shrink:0; }
+.empty { font-family:'Fira Code',monospace; font-size:.62rem; color:var(--sub); padding:1.4rem 0; }
+
+/* ── 가이드 ── */
+.guide { background:var(--bg2); border-left:2px solid var(--accent); padding:.85rem 1.1rem; margin-bottom:1.1rem; }
+.guide p { font-size:.76rem; color:var(--sub); line-height:1.8; word-break:keep-all; }
+.guide code { font-family:'Fira Code',monospace; font-size:.68rem; color:var(--accent); }
+.guide strong { color:var(--text); font-weight:400; }
+
+/* ── 기타 ── */
+.divider { border:none; border-top:1px solid var(--border); margin:1.8rem 0; }
+.back { display:inline-block; color:var(--sub); text-decoration:none; font-family:'Fira Code',monospace; font-size:.6rem; letter-spacing:.1em; border:1px solid var(--border); padding:.45rem .95rem; transition:all .2s; }
+.back:hover { color:var(--accent); border-color:var(--border-h); }
+.toast { position:fixed; bottom:1.8rem; left:50%; transform:translateX(-50%); background:var(--bg1); border:1px solid var(--border-h); color:var(--accent); padding:.6rem 1.25rem; font-family:'Fira Code',monospace; font-size:.6rem; letter-spacing:.1em; opacity:0; transition:opacity .3s; pointer-events:none; z-index:9999; white-space:nowrap; }
+.toast.show { opacity:1; }
+
+@media(max-width:600px) {
+  .topbar { padding:0 1rem; flex-wrap:wrap; row-gap:.3rem; padding-bottom:.3rem; }
+  .wrap { padding:1.8rem 1rem; }
+  .row2 { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- 로그인 -->
+<div id="login">
+  <div class="login-card">
+    <div class="login-eye">admin access</div>
+    <div class="login-title">관리자 패널</div>
+    <label>비밀번호</label>
+    <input type="password" id="pw-input" placeholder="••••••••">
+    <div class="err-msg" id="err-msg">// 비밀번호가 틀렸어요</div>
+    <button class="btn btn-full" onclick="doLogin()" style="margin-top:1.1rem">입장 →</button>
+  </div>
+</div>
+
+<!-- 어드민 -->
+<div id="admin">
+  <div class="topbar">
+    <div class="topbar-logo">EK / Admin</div>
+    <div class="tabbar">
+      <button class="tbtn on" data-tab="about">소개</button>
+      <button class="tbtn" data-tab="projects">프로젝트</button>
+      <button class="tbtn" data-tab="skills">기술</button>
+      <button class="tbtn" data-tab="gallery">갤러리</button>
+      <button class="tbtn" data-tab="config">설정</button>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">로그아웃</button>
+  </div>
+
+  <div class="wrap">
+
+    <!-- 소개 -->
+    <div class="panel on" id="tab-about">
+      <div class="stitle">소개 글 수정</div>
+      <div class="card">
+        <div class="card-note">줄바꿈으로 문단을 구분해요. 저장하면 포트폴리오에 즉시 반영돼요.</div>
+        <label>자기소개 텍스트</label>
+        <textarea id="about-text" placeholder="한국에서 백엔드 개발을 향해 달려가는 고등학생이에요..."></textarea>
+        <button class="btn btn-full" onclick="saveAbout()">저장 →</button>
+      </div>
+    </div>
+
+    <!-- 프로젝트 -->
+    <div class="panel" id="tab-projects">
+      <div class="stitle">프로젝트 추가</div>
+      <div class="card">
+        <label>프로젝트 이름 *</label>
+        <input type="text" id="pj-name" placeholder="응급의료 종합 시스템">
+        <label>설명</label>
+        <textarea id="pj-desc" placeholder="어떤 걸 만들었나요?"></textarea>
+        <label>태그 (쉼표로 구분)</label>
+        <input type="text" id="pj-tags" placeholder="PHP, MySQL, API">
+        <label>GitHub / 링크 (선택)</label>
+        <input type="url" id="pj-link" placeholder="https://github.com/...">
+        <button class="btn btn-full" onclick="addProject()">프로젝트 추가 →</button>
+      </div>
+      <div class="stitle">등록된 프로젝트</div>
+      <div class="lw" id="pj-list"></div>
+    </div>
+
+    <!-- 기술 -->
+    <div class="panel" id="tab-skills">
+      <div class="stitle">기술 추가</div>
+      <div class="card">
+        <div class="row2">
+          <div>
+            <label>언어 / 프레임워크 *</label>
+            <input type="text" id="sk-name" placeholder="Python">
+          </div>
+          <div>
+            <label>숙련도 레벨 라벨</label>
+            <input type="text" id="sk-label" placeholder="중급">
+          </div>
+        </div>
+        <label>숙련도 — <span id="sk-val">65</span>%</label>
+        <div class="range-row">
+          <input type="range" min="0" max="100" value="65" id="sk-range" oninput="document.getElementById('sk-val').textContent=this.value">
+        </div>
+        <button class="btn btn-full" onclick="addSkill()">기술 추가 →</button>
+      </div>
+      <div class="stitle">등록된 기술</div>
+      <div class="lw" id="sk-list"></div>
+    </div>
+
+    <!-- 갤러리 -->
+    <div class="panel" id="tab-gallery">
+      <div class="stitle">사진 직접 업로드</div>
+      <div class="card">
+        <label>이미지 파일 * (4MB 이하 권장)</label>
+        <input type="file" id="ph-file" accept="image/*" onchange="onPhotoFile(this)">
+        <img class="prev-img" id="ph-preview" alt="미리보기">
+        <div class="row2">
+          <div>
+            <label>촬영 장소 *</label>
+            <input type="text" id="ph-loc" placeholder="서울, 한국">
+          </div>
+          <div>
+            <label>촬영 날짜 *</label>
+            <input type="date" id="ph-date">
+          </div>
+        </div>
+        <button class="btn btn-full" onclick="addPhoto()">사진 추가 →</button>
+      </div>
+      <div class="stitle">등록된 사진</div>
+      <div class="lw" id="ph-list"></div>
+
+      <div class="stitle">Instagram 게시물 추가</div>
+      <div class="guide">
+        <p>인스타 앱 → 게시물 → <strong>공유 → 링크 복사</strong> 후 붙여넣으세요.<br>
+        형식: <code>https://www.instagram.com/p/게시물코드/</code><br>
+        <strong>공개 계정</strong>의 게시물만 임베드가 표시돼요.</p>
+      </div>
+      <div class="card">
+        <label>Instagram 게시물 URL *</label>
+        <input type="url" id="ig-url" placeholder="https://www.instagram.com/p/ABC123xyz/">
+        <div class="ig-prev" id="ig-prev"></div>
+        <div class="btn-row">
+          <button class="btn" onclick="previewIG()">미리보기 →</button>
+          <button class="btn" onclick="addIG()">갤러리에 추가 →</button>
+        </div>
+      </div>
+      <div class="stitle">등록된 Instagram 게시물</div>
+      <div class="lw" id="ig-list"></div>
+    </div>
+
+    <!-- 설정 -->
+    <div class="panel" id="tab-config">
+      <div class="stitle">소셜 링크</div>
+      <div class="card">
+        <label>GitHub URL</label>
+        <input type="url" id="cfg-gh" placeholder="https://github.com/username">
+        <label>Instagram 프로필 URL</label>
+        <input type="url" id="cfg-ig" placeholder="https://instagram.com/username">
+        <button class="btn btn-full" onclick="saveConfig()">저장 →</button>
+      </div>
+      <div class="stitle">비밀번호 변경</div>
+      <div class="card">
+        <label>새 비밀번호</label>
+        <input type="password" id="new-pw" placeholder="새 비밀번호">
+        <label>확인</label>
+        <input type="password" id="cfm-pw" placeholder="비밀번호 확인">
+        <button class="btn btn-full btn-danger" onclick="changePw()">비밀번호 변경 →</button>
+      </div>
+      <div class="divider"></div>
+      <a href="index.html" class="back">← 포트폴리오 보기</a>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+const $ = id => document.getElementById(id);
+
+// ── 토스트 ──────────────────────────────────────────────────────
+function toast(msg) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2700);
+}
+
+// ── DB 유틸 ─────────────────────────────────────────────────────
+function dbGet(key) {
+  try {
+    const v = localStorage.getItem(key);
+    return v ? JSON.parse(v) : null;
+  } catch(e) { console.warn('dbGet', key, e); return null; }
+}
+function dbSet(key, val) {
+  try {
+    localStorage.setItem(key, JSON.stringify(val));
+    return true;
+  } catch(e) {
+    console.error('dbSet', key, e);
+    toast('// 저장 실패 — 저장 공간이 부족할 수 있어요');
+    return false;
+  }
+}
+
+// ── 기본 데이터 초기화 (최초 1회) ──────────────────────────────
+function initDefaults() {
+  if (!dbGet('projects')) {
+    dbSet('projects', [
+      { name:'응급의료 종합 시스템', desc:'구급차-병원 매칭 플랫폼 — PHP + MySQL 백엔드로 이송 시간 단축 및 생존율 향상.', tags:['PHP','MySQL','Database','API'], link:'' },
+      { name:'고등학교 시간표 앱', desc:'실제로 쓰려고 만든 시간표 앱. 학교 과제가 아닌 실용 목적의 프로덕트.', tags:['App Inventor','PHP','SQL'], link:'' },
+      { name:'데이터 보안 암호화 시스템', desc:'AES_ENCRYPT + HEX 기반 민감 정보 암호화 파이프라인.', tags:['PHP','MySQL','Security'], link:'' },
+    ]);
+  }
+  if (!dbGet('skills')) {
+    dbSet('skills', [
+      { name:'Python', level:65, label:'중급' },
+      { name:'C',      level:55, label:'중급' },
+      { name:'SQL',    level:70, label:'중급' },
+      { name:'PHP',    level:60, label:'중급' },
+    ]);
+  }
+  if (!dbGet('photos'))      dbSet('photos', []);
+  if (!dbGet('insta_posts')) dbSet('insta_posts', []);
+  if (!dbGet('config'))      dbSet('config', {});
+}
+
+// ── 인증 ────────────────────────────────────────────────────────
+const DEF_PW = 'admin123';
+const getPw  = () => localStorage.getItem('admin_pw') || DEF_PW;
+
+function doLogin() {
+  if ($('pw-input').value === getPw()) {
+    $('login').style.display = 'none';
+    $('admin').style.display = 'block';
+    initDefaults();
+    renderAll();
+  } else {
+    $('err-msg').style.display = 'block';
+  }
+}
+function doLogout() {
+  $('admin').style.display = 'none';
+  $('login').style.display  = 'flex';
+  $('pw-input').value = '';
+  $('err-msg').style.display = 'none';
+}
+function changePw() {
+  const a = $('new-pw').value, b = $('cfm-pw').value;
+  if (!a) return toast('// 새 비밀번호를 입력해주세요');
+  if (a !== b) return toast('// 비밀번호가 일치하지 않아요');
+  localStorage.setItem('admin_pw', a);
+  $('new-pw').value = ''; $('cfm-pw').value = '';
+  toast('// 비밀번호가 변경됐어요');
+}
+$('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// ── 탭 ──────────────────────────────────────────────────────────
+document.querySelectorAll('.tbtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('on'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+    btn.classList.add('on');
+    $('tab-' + btn.dataset.tab).classList.add('on');
+  });
+});
+
+// ── 소개 ────────────────────────────────────────────────────────
+function loadAbout() {
+  const cfg = dbGet('config') || {};
+  if (cfg.aboutText) $('about-text').value = cfg.aboutText;
+}
+function saveAbout() {
+  const cfg = dbGet('config') || {};
+  cfg.aboutText = $('about-text').value;
+  if (dbSet('config', cfg)) toast('// 소개 글이 저장됐어요');
+}
+
+// ── 프로젝트 ────────────────────────────────────────────────────
+function renderProjects() {
+  const list = dbGet('projects') || [];
+  const el = $('pj-list');
+  if (!list.length) { el.innerHTML = '<div class="empty">// 등록된 프로젝트가 없어요</div>'; return; }
+  el.innerHTML = list.map((p, i) => `
+    <div class="li">
+      <div class="li-info">
+        <div class="li-name">${p.name}</div>
+        <div class="li-sub">${(p.tags||[]).join(' · ')}</div>
+      </div>
+      <div class="li-acts">
+        <button class="btn btn-sm btn-danger" onclick="delProject(${i})">삭제</button>
+      </div>
+    </div>`).join('');
+}
+function addProject() {
+  const name = $('pj-name').value.trim();
+  if (!name) return toast('// 프로젝트 이름을 입력해주세요');
+  const list = dbGet('projects') || [];
+  list.unshift({
+    name,
+    desc: $('pj-desc').value.trim(),
+    tags: $('pj-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+    link: $('pj-link').value.trim(),
+  });
+  if (!dbSet('projects', list)) return;
+  ['pj-name','pj-desc','pj-tags','pj-link'].forEach(id => $(id).value = '');
+  renderProjects();
+  toast('// 프로젝트가 추가됐어요');
+}
+function delProject(i) {
+  if (!confirm('이 프로젝트를 삭제할까요?')) return;
+  const list = dbGet('projects') || [];
+  list.splice(i, 1);
+  if (!dbSet('projects', list)) return;
+  renderProjects();
+  toast('// 삭제됐어요');
+}
+
+// ── 기술 ────────────────────────────────────────────────────────
+function renderSkills() {
+  const list = dbGet('skills') || [];
+  const el = $('sk-list');
+  if (!list.length) { el.innerHTML = '<div class="empty">// 등록된 기술이 없어요</div>'; return; }
+  el.innerHTML = list.map((s, i) => `
+    <div class="li">
+      <div class="li-info">
+        <div class="li-name">${s.name}</div>
+        <div class="li-sub">${s.label} — ${s.level}%</div>
+      </div>
+      <div class="li-acts">
+        <button class="btn btn-sm btn-danger" onclick="delSkill(${i})">삭제</button>
+      </div>
+    </div>`).join('');
+}
+function addSkill() {
+  const name = $('sk-name').value.trim();
+  if (!name) return toast('// 기술 이름을 입력해주세요');
+  const list = dbGet('skills') || [];
+  list.push({ name, level: parseInt($('sk-range').value), label: $('sk-label').value.trim() || '중급' });
+  if (!dbSet('skills', list)) return;
+  $('sk-name').value = ''; $('sk-label').value = '';
+  $('sk-range').value = 65; $('sk-val').textContent = '65';
+  renderSkills();
+  toast('// 기술이 추가됐어요');
+}
+function delSkill(i) {
+  if (!confirm('이 기술을 삭제할까요?')) return;
+  const list = dbGet('skills') || [];
+  list.splice(i, 1);
+  if (!dbSet('skills', list)) return;
+  renderSkills();
+  toast('// 삭제됐어요');
+}
+
+// ── 사진 ────────────────────────────────────────────────────────
+let pendingPhoto = null;
+function onPhotoFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) toast('// 파일이 커요 — 4MB 이하를 권장해요');
+  const reader = new FileReader();
+  reader.onload = e => {
+    pendingPhoto = e.target.result;
+    $('ph-preview').src = pendingPhoto;
+    $('ph-preview').style.display = 'block';
+  };
+  reader.onerror = () => toast('// 파일 읽기 실패');
+  reader.readAsDataURL(file);
+}
+function renderPhotos() {
+  const list = dbGet('photos') || [];
+  const el = $('ph-list');
+  if (!list.length) { el.innerHTML = '<div class="empty">// 등록된 사진이 없어요</div>'; return; }
+  el.innerHTML = list.map((p, i) => `
+    <div class="li">
+      <img src="${p.src}" class="li-thumb" alt="">
+      <div class="li-info">
+        <div class="li-name">${p.location}</div>
+        <div class="li-sub">${p.date}</div>
+      </div>
+      <div class="li-acts">
+        <button class="btn btn-sm btn-danger" onclick="delPhoto(${i})">삭제</button>
+      </div>
+    </div>`).join('');
+}
+function addPhoto() {
+  if (!pendingPhoto)          return toast('// 이미지를 먼저 선택해주세요');
+  const loc  = $('ph-loc').value.trim();
+  const date = $('ph-date').value;
+  if (!loc)  return toast('// 촬영 장소를 입력해주세요');
+  if (!date) return toast('// 촬영 날짜를 입력해주세요');
+  const list = dbGet('photos') || [];
+  list.push({ src: pendingPhoto, location: loc, date });
+  if (!dbSet('photos', list)) return;
+  pendingPhoto = null;
+  $('ph-preview').style.display = 'none';
+  $('ph-preview').src = '';
+  $('ph-file').value = '';
+  $('ph-loc').value = '';
+  $('ph-date').value = '';
+  renderPhotos();
+  toast('// 사진이 추가됐어요');
+}
+function delPhoto(i) {
+  if (!confirm('이 사진을 삭제할까요?')) return;
+  const list = dbGet('photos') || [];
+  list.splice(i, 1);
+  if (!dbSet('photos', list)) return;
+  renderPhotos();
+  toast('// 삭제됐어요');
+}
+
+// ── 인스타그램 ──────────────────────────────────────────────────
+function parseIG(raw) {
+  const m = raw.match(/instagram\.com\/p\/([A-Za-z0-9_\-]+)/);
+  if (!m) return null;
+  const code = m[1];
+  return { code, url:`https://www.instagram.com/p/${code}/`, embedUrl:`https://www.instagram.com/p/${code}/embed/` };
+}
+function previewIG() {
+  const parsed = parseIG($('ig-url').value.trim());
+  if (!parsed) return toast('// 올바른 인스타 게시물 URL이 아니에요');
+  const box = $('ig-prev');
+  box.style.display = 'block';
+  box.innerHTML = `<iframe src="${parsed.embedUrl}" width="390" height="440" frameborder="0" scrolling="no" allowtransparency="true"></iframe>`;
+  toast('// 미리보기 불러오는 중...');
+}
+function addIG() {
+  const parsed = parseIG($('ig-url').value.trim());
+  if (!parsed) return toast('// 올바른 인스타 게시물 URL이 아니에요');
+  const list = dbGet('insta_posts') || [];
+  if (list.find(p => p.code === parsed.code)) return toast('// 이미 추가된 게시물이에요');
+  list.unshift({ ...parsed, addedAt: new Date().toLocaleDateString('ko-KR') });
+  if (!dbSet('insta_posts', list)) return;
+  $('ig-url').value = '';
+  $('ig-prev').style.display = 'none';
+  $('ig-prev').innerHTML = '';
+  renderIG();
+  toast('// Instagram 게시물이 추가됐어요');
+}
+function renderIG() {
+  const list = dbGet('insta_posts') || [];
+  const el = $('ig-list');
+  if (!list.length) { el.innerHTML = '<div class="empty">// 등록된 Instagram 게시물이 없어요</div>'; return; }
+  el.innerHTML = list.map((p, i) => `
+    <div class="li">
+      <div class="li-ig">IG</div>
+      <div class="li-info">
+        <div class="li-name">${p.url}</div>
+        <div class="li-sub">추가일: ${p.addedAt}</div>
+      </div>
+      <div class="li-acts">
+        <button class="btn btn-sm" onclick="window.open('${p.url}','_blank')">보기</button>
+        <button class="btn btn-sm btn-danger" onclick="delIG(${i})">삭제</button>
+      </div>
+    </div>`).join('');
+}
+function delIG(i) {
+  if (!confirm('이 게시물을 삭제할까요?')) return;
+  const list = dbGet('insta_posts') || [];
+  list.splice(i, 1);
+  if (!dbSet('insta_posts', list)) return;
+  renderIG();
+  toast('// 삭제됐어요');
+}
+
+// ── 설정 ────────────────────────────────────────────────────────
+function loadConfig() {
+  const cfg = dbGet('config') || {};
+  if (cfg.github)    $('cfg-gh').value = cfg.github;
+  if (cfg.instagram) $('cfg-ig').value = cfg.instagram;
+}
+function saveConfig() {
+  const cfg = dbGet('config') || {};
+  cfg.github    = $('cfg-gh').value.trim();
+  cfg.instagram = $('cfg-ig').value.trim();
+  if (dbSet('config', cfg)) toast('// 설정이 저장됐어요');
+}
+
+// ── 전체 렌더 ───────────────────────────────────────────────────
+function renderAll() {
+  loadAbout();
+  loadConfig();
+  renderProjects();
+  renderSkills();
+  renderPhotos();
+  renderIG();
+}
+</script>
+</body>
+</html>
